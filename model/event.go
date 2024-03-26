@@ -6,10 +6,10 @@ import (
 
 type Event struct {
 	Id          int
-	Name        string
-	Description string
-	Location    string
-	DateTime    time.Time
+	Name        string    `binding:"required"`
+	Description string    `binding:"required"`
+	Location    string    `binding:"required"`
+	DateTime    time.Time `binding:"required"`
 	UserId      int
 }
 
