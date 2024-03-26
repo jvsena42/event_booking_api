@@ -16,7 +16,7 @@ type Event struct {
 var events = []Event{}
 
 func (e Event) Save() {
-	append(events, e) //TODO save in a database
+	events = append(events, e) //TODO save in a database
 }
 
 func GetAllEvents() []Event {
