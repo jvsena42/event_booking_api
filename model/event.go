@@ -18,3 +18,7 @@ var events = []Event{}
 func (e Event) Save() {
 	append(events, e) //TODO save in a database
 }
+
+func GetAllEvents() []Event {
+	return events
+}
