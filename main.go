@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"com.go/event_booking/db"
@@ -19,7 +20,14 @@ func main() {
 }
 
 func getEvents(context *gin.Context) {
-	events := model.GetAllEvents()
+	events, err := model.GetAllEvents()
+
+	if err != nil {
+		fmt.Println("Error getEvents: ", err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch events"})
+		return
+	}
+
 	context.JSON(http.StatusOK, events)
 }
 
@@ -29,10 +37,18 @@ func createEvent(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
+		return
 	}
 
 	event.Id = 1
 	event.UserId = 1
-	event.Save()
+
+	errorSave := event.Save()
+
+	if errorSave != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not parse request data."})
+		return
+	}
+
 	context.JSON(http.StatusCreated, gin.H{"message": "Event created!", "event": event})
 }
