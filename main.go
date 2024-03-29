@@ -26,7 +26,7 @@ func getEvents(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch events"})
-		log.Fatal("ERROR getEvents: ", err)
+		log.Println("ERROR getEvents: ", err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func createEvent(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
-		log.Fatal("ERROR createEvent: ", err)
+		log.Println("ERROR createEvent: ", err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func createEvent(context *gin.Context) {
 
 	if errorSave != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not parse request data."})
-		log.Fatal("ERROR createEvent: ", errorSave)
+		log.Println("ERROR createEvent: ", errorSave)
 		return
 	}
 
@@ -62,7 +62,7 @@ func getEvent(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "could not parse event ID"})
-		log.Fatal("ERROR getEvent: ", err)
+		log.Println("ERROR getEvent: ", err)
 		return
 	}
 
@@ -70,7 +70,7 @@ func getEvent(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch event"})
-		log.Fatal("ERROR getEvent: ", err)
+		log.Println("ERROR getEvent: ", err)
 		return
 	}
 
