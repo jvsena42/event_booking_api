@@ -1,22 +1,19 @@
 package model
 
 import (
-	"time"
-
 	"com.go/event_booking/db"
 )
 
 type User struct {
-	Id        int64
-	Email     string `binding:"required"`
-	Password  string `binding:"required"`
-	CreatedAt time.Time
+	Id       int64
+	Email    string `binding:"required"`
+	Password string `binding:"required"`
 }
 
 func (u User) Save() error {
 	query := `
-	INSERT INTO users(email, password, created_at)
-	VALUES (?, ?, ?)
+	INSERT INTO users(email, password)
+	VALUES (?, ?)
 	`
 	stmt, err := db.DB.Prepare(query)
 
@@ -25,7 +22,7 @@ func (u User) Save() error {
 	}
 
 	defer stmt.Close()
-	result, err := stmt.Exec(u.Email, u.Password, time.Now())
+	result, err := stmt.Exec(u.Email, u.Password)
 
 	if err != nil {
 		return err
