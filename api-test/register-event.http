@@ -1,0 +1,7 @@
+POST http://localhost:8080/events/1/register
+content-type: : application/json
+
+{
+    "email": "test5@email.com",
+    "password": "123456"
+}
