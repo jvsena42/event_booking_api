@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -59,28 +60,32 @@ func GenerateToken(email string, userId int64) (string, error) {
 func VerifyToken(token string) (int64, error) {
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		_, ok := token.Method.(*jwt.SigningMethodECDSA)
 
 		if !ok {
+			log.Println("ERROR VerifyToken: Unexpected signing method")
 			return nil, errors.New("Unexpected signing method")
 		}
 
-		return privateKey, nil
+		return &privateKey.PublicKey, nil
 	})
 
 	if err != nil {
+		log.Println("ERROR VerifyToken: ", err)
 		return 0, errors.New("Could not parse token")
 	}
 
 	tokenIsValid := parsedToken.Valid
 
 	if !tokenIsValid {
+		log.Println("ERROR VerifyToken: Invalid Token")
 		return 0, errors.New("Invalid Token!")
 	}
 
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 
 	if !ok {
+		log.Println("ERROR VerifyToken: Invalid Token claims")
 		return 0, errors.New("Invalid token claims!")
 	}
 
