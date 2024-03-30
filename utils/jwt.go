@@ -4,11 +4,47 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/x509"
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var privateKey *ecdsa.PrivateKey
+
+func init() {
+
+	keyFile := "keyfile.pem"
+
+	if _, err := os.Stat(keyFile); os.IsNotExist(err) {
+		privateKey, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+		if err != nil {
+			panic(err)
+		}
+
+		keyBytes, err := x509.MarshalECPrivateKey(privateKey)
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile(keyFile, keyBytes, 0600)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		keyBytes, err := os.ReadFile(keyFile)
+		if err != nil {
+			panic(err)
+		}
+
+		privateKey, err = x509.ParseECPrivateKey(keyBytes)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
 
 func GenerateToken(email string, userId int64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
@@ -17,19 +53,10 @@ func GenerateToken(email string, userId int64) (string, error) {
 		"exp":    time.Now().Add(time.Hour * 2).Unix(),
 	})
 
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		return "", err
-	}
-
 	return token.SignedString(privateKey)
 }
 
 func VerifyToken(token string) (int64, error) {
-	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		return 0, err
-	}
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
