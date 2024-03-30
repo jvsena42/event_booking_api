@@ -25,10 +25,10 @@ func GenerateToken(email string, userId int64) (string, error) {
 	return token.SignedString(privateKey)
 }
 
-func VerifyToken(token string) error {
+func VerifyToken(token string) (int64, error) {
 	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
@@ -42,23 +42,23 @@ func VerifyToken(token string) error {
 	})
 
 	if err != nil {
-		return errors.New("Could not parse token")
+		return 0, errors.New("Could not parse token")
 	}
 
 	tokenIsValid := parsedToken.Valid
 
 	if !tokenIsValid {
-		return errors.New("Invalid Token!")
+		return 0, errors.New("Invalid Token!")
 	}
 
-	/* claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 
 	if !ok {
-		return errors.New("Invalid token claims!")
+		return 0, errors.New("Invalid token claims!")
 	}
 
-	email := claims["email"].(string)
-	userId := claims["userId"].(int64) */
+	//email := claims["email"].(string)
+	userId := claims["userId"].(int64)
 
-	return nil
+	return userId, nil
 }
